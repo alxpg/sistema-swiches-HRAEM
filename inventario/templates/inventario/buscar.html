@@ -1,0 +1,27 @@
+{% extends "inventario/base.html" %}
+{% block content %}
+<h3>Resultados para "{{ q }}"</h3>
+{% if resultados %}
+<table class="table table-striped">
+    <thead>
+        <tr><th>Nodo</th><th>Tipo</th><th>IP</th><th>Switch</th><th>Puerto</th><th>IDF</th><th>Nivel</th><th>VLANs</th></tr>
+    </thead>
+    <tbody>
+    {% for r in resultados %}
+        <tr>
+            <td>{{ r.nodo.nombre }}</td>
+            <td>{{ r.nodo.get_tipo_display }}</td>
+            <td>{{ r.nodo.ip }}</td>
+            <td>{{ r.switch.marca }} {{ r.switch.modelo }}</td>
+            <td>{{ r.puerto.numero }}</td>
+            <td>{{ r.idf.nombre }}</td>
+            <td>{{ r.nivel.nombre }}</td>
+            <td>{% for v in r.vlans %}<span class="badge bg-info text-dark">{{ v.numero }}</span> {% endfor %}</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="text-muted">Sin resultados.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,4 @@
+<option value="">Todos</option>
+{% for s in switches %}
+    <option value="{{ s.id }}">{{ s.marca }} {{ s.modelo }} ({{ s.ip|default:"sin IP" }})</option>
+{% endfor %}

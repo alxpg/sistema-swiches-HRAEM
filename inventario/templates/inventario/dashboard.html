@@ -1,0 +1,74 @@
+{% extends "inventario/base.html" %}
+{% block content %}
+<h3>Dashboard de puertos</h3>
+<form class="row g-3 mb-4" method="get">
+    <div class="col-md-3">
+        <label class="form-label">Nivel</label>
+        <select class="form-select" name="nivel"
+                hx-get="{% url 'inventario:opciones_idf' %}"
+                hx-target="#idf" hx-trigger="change" hx-include="[name='nivel']">
+            <option value="">Todos</option>
+            {% for n in niveles %}
+                <option value="{{ n.id }}" {% if sel.nivel == n.id|stringformat:"s" %}selected{% endif %}>{{ n.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">IDF</label>
+        <select class="form-select" id="idf" name="idf"
+                hx-get="{% url 'inventario:opciones_switch' %}"
+                hx-target="#switch" hx-trigger="change" hx-include="[name='idf']">
+            <option value="">Todos</option>
+            {% for i in idfs %}<option value="{{ i.id }}" {% if sel.idf == i.id|stringformat:"s" %}selected{% endif %}>{{ i.nombre }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Switch</label>
+        <select class="form-select" id="switch" name="switch"
+                hx-get="{% url 'inventario:opciones_puerto' %}"
+                hx-target="#puerto" hx-trigger="change" hx-include="[name='switch']">
+            <option value="">Todos</option>
+            {% for s in switches %}<option value="{{ s.id }}" {% if sel.switch == s.id|stringformat:"s" %}selected{% endif %}>{{ s.marca }} {{ s.modelo }} ({{ s.ip }})</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Puerto</label>
+        <select class="form-select" id="puerto" name="puerto">
+            <option value="">-</option>
+            {% for p in puertos %}<option value="{{ p.numero }}" {% if sel.puerto == p.numero|stringformat:"s" %}selected{% endif %}>{{ p.numero }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-md-1 d-flex align-items-end">
+        <button class="btn btn-primary w-100">Ver</button>
+    </div>
+</form>
+
+{% if puerto %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        Puerto {{ puerto.numero }} — {{ puerto.switch.marca }} {{ puerto.switch.modelo }}
+    </div>
+    <div class="card-body">
+        <p><b>IDF:</b> {{ puerto.switch.idf.nombre }}</p>
+        <p><b>Nivel:</b> {{ puerto.switch.idf.nivel.nombre|default:"-" }}</p>
+        <p><b>IP Switch:</b> {{ puerto.switch.ip|default:"-" }}</p>
+        <p><b>VLANs:</b>
+            {% for v in puerto.vlans.all %}
+                <span class="badge bg-info text-dark">{{ v.numero }} {{ v.nombre }}</span>
+            {% empty %}<span class="text-muted">sin VLANs</span>{% endfor %}
+        </p>
+        <hr>
+        {% if nodo %}
+            <h5>Nodo: {{ nodo.nombre }}</h5>
+            <p><b>Tipo:</b> {{ nodo.get_tipo_display }}</p>
+            <p><b>Estado:</b> {{ nodo.get_estado_display }}</p>
+            <p><b>IP:</b> {{ nodo.ip|default:"-" }}</p>
+            <p><b>Equipo:</b> {{ nodo.nombre_equipo|default:"-" }}</p>
+            <p><b>Ubicación:</b> {{ nodo.ubicacion|default:"-" }}</p>
+        {% else %}
+            <p class="text-muted">Sin nodo asignado en este puerto.</p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
