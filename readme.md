@@ -20,6 +20,8 @@ basado en el Excel "Ordenamiento Switches 2024".
 ## Instalación
 
 1. Clonar el repositorio:
+
    ```bash
-   git clone https://github.com/tu-usuario/sistema-switches.git
+   git clone https://github.com/tu-usuario/sistema-switches-HRAEM.git
    cd sistema-switches
+   ```
