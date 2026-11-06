@@ -16,8 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin  # pyright: ignore[reportMissingModuleSource]
 from django.urls import include, path  # pyright: ignore[reportMissingModuleSource]
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    # Rutas de autenticación
+    path("login/", auth_views.LoginView.as_view(template_name="inventario/login.html"), name="login"),
+    path("logout/", auth_views.LogoutView.as_view(), name="logout"),
+    # Tus rutas de la app
     path("", include("inventario.urls")),
 ]

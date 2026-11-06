@@ -1,0 +1,116 @@
+{% extends "inventario/base.html" %}
+{% block content %}
+<h3 class="mb-4">Asignar / Editar Nodo en Puerto</h3>
+
+<!-- Mensajes de éxito/error -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
+<!-- Formulario de selección -->
+<form class="row g-3 mb-4 bg-white p-3 border rounded shadow-sm" method="get">
+    <div class="col-md-3">
+        <label class="form-label">Nivel (opcional para filtrar)</label>
+        <select class="form-select" name="nivel"
+                hx-get="{% url 'inventario:opciones_switch' %}"
+                hx-target="#switch" hx-trigger="change" hx-include="[name='nivel']">
+            <option value="">Todos</option>
+            {% for n in niveles %}
+                <option value="{{ n.id }}" {% if sel.nivel == n.id|stringformat:"s" %}selected{% endif %}>{{ n.nombre }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-4">
+        <label class="form-label">Switch</label>
+        <select class="form-select" id="switch" name="switch"
+                hx-get="{% url 'inventario:opciones_puerto' %}"
+                hx-target="#puerto" hx-trigger="change" hx-include="[name='switch']">
+            <option value="">Selecciona un switch</option>
+            {% for s in switches %}
+                <option value="{{ s.id }}" {% if sel.switch == s.id|stringformat:"s" %}selected{% endif %}>
+                    {{ s.marca }} {{ s.modelo }} ({{ s.idf.nombre }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">Puerto</label>
+        <select class="form-select" id="puerto" name="puerto">
+            <option value="">-</option>
+            {% for p in puertos %}
+                <option value="{{ p.numero }}" {% if sel.puerto == p.numero|stringformat:"s" %}selected{% endif %}>{{ p.numero }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100">Seleccionar</button>
+    </div>
+</form>
+
+<!-- Zona de edición del Nodo -->
+{% if puerto_actual %}
+<div class="card shadow-sm">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <span>Puerto {{ puerto_actual.numero }} — {{ puerto_actual.switch.marca }} {{ puerto_actual.switch.modelo }}</span>
+        {% if nodo_actual %}
+            <a href="{% url 'inventario:liberar_puerto' puerto_actual.id %}" class="btn btn-sm btn-danger" onclick="return confirm('¿Seguro que deseas eliminar este nodo y liberar el puerto?')">Liberar Puerto</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        <p class="text-muted small mb-4">
+            <b>Ubicación Física:</b> {{ puerto_actual.switch.idf.nombre }} | {{ puerto_actual.switch.idf.nivel.nombre }}
+        </p>
+        
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="puerto_id" value="{{ puerto_actual.id }}">
+            
+            <div class="row g-3">
+                <!-- Campos del formulario renderizados manualmente para mejor control -->
+                <div class="col-md-4">
+                    <label class="form-label">Nomenclatura del Nodo *</label>
+                    {{ form.nombre }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Estado</label>
+                    {{ form.estado }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Tipo de Dispositivo</label>
+                    {{ form.tipo }}
+                </div>
+                
+                <div class="col-md-4">
+                    <label class="form-label">Dirección IP</label>
+                    {{ form.ip }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Nombre del Equipo</label>
+                    {{ form.nombre_equipo }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Ubicación Física</label>
+                    {{ form.ubicacion }}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">Observaciones</label>
+                    {{ form.observacion }}
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success">Guardar Nodo</button>
+                <a href="{% url 'inventario:dashboard' %}" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
